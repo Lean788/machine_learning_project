@@ -78,6 +78,74 @@ pd.options.display.max_colwidth = 50
 
 # ACCEDIENDO A DF_TEST
 
-test = read_csv_from_zip('./data.zip', 'test.csv')
+test = read_csv_from_zip('./src/src/data.zip', 'test.csv')
 
-print(test.head(2))
+# ==============================================================================
+
+# Importamos el modelo escogido
+import datetime
+
+now = datetime.datetime.now()
+formatted_date = now.strftime("%y%m%d%H%M%S")
+model_pattern = f"model_\d{{12}}.pkl"
+
+
+
+best_model = load_model_pattern('./src/src/production.zip', model_pattern)
+
+
+# ==============================================================================
+
+# Dividimos train en features y target.
+
+y_test = test['reviews.rating_binned']
+X_test = test.drop(columns='reviews.rating_binned')
+
+# print(X_test.shape)
+# print(y_test.shape)
+
+print('\n','\n','-------------- RANDOM FOREST REGRESSOR --------------','\n','\n')
+
+# Escalado
+
+scaler = StandardScaler()
+
+scaler.fit(X_test)
+
+X_test_scaled = scaler.transform(X_test)
+
+# Realizar predicciones en los datos de prueba escalados
+y_pred = best_model.predict(X_test_scaled)
+
+print('\n','\n','-------------- RESULTADOS TOTALES DE LAS MÉTRICAS --------------','\n','\n')
+
+print("Score del modelo (R^2):", round(best_model.score(X_test, y_test), 4))
+print("R^2 score:", round(r2_score(y_pred, y_test), 4))
+print("MAE score:", round(mean_absolute_error(y_pred, y_test), 4))
+print("MSE score:", round(mean_squared_error(y_pred, y_test), 4))
+print("RMSE score:", round(np.sqrt(mean_squared_error(y_pred, y_test)), 4))
+
+def mean_absolute_percentage_error(y_pred, y_true): 
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+
+print("MAPE score:", round(mean_absolute_percentage_error(y_pred, y_test), 4))
+
+
+# ==============================================================================
+
+print('\n','\n', ' Procedemos a guardar la predicción en production:', '\n')
+
+# ==============================================================================
+
+
+test['prediction'] = y_pred
+
+predictions = pd.DataFrame({'id':test.index, 'predictions':test['prediction'] })
+
+predictions.to_csv('./src/src/prediction/prediction.csv', index = False, encoding='utf-8')
+
+print('Predicción guardada con exito.')
+# ==============================================================================
+

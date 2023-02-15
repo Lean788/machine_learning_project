@@ -291,8 +291,9 @@ def escaler_data(X_train, X_test):
 
 
 
-def save_model(model):
+def save_model_dir(model, directory='/src/src/model'):
     import pickle
+    import os
     from datetime import datetime
     """
     Guarda el modelo en un archivo con el nombre "model_fecha.pkl", donde
@@ -310,8 +311,13 @@ def save_model(model):
     # Generar el nombre del archivo con el formato "model_fecha.pkl"
     file_name = f"model_{formatted_date}.pkl"
 
-    # Guardar el modelo en el archivo
-    with open(file_name, "wb") as file:
+    # Crear el directorio si no existe
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Guardar el modelo en el archivo dentro del directorio
+    file_path = os.path.join(directory, file_name)
+    with open(file_path, "wb") as file:
         pickle.dump(model, file)
 
 
@@ -367,3 +373,111 @@ def read_csv_from_zip(zip_path, csv_filename):
         with archive.open(csv_filename) as file:
             df = pd.read_csv(file)
     return df
+
+
+
+def save_model(model, zip_file="models.zip"):
+    import os
+    import zipfile
+    import pickle
+    from datetime import datetime
+    """
+    Guarda el modelo en un archivo zip con el nombre "models.zip".
+
+    Args:
+        model: El modelo que se va a guardar.
+        zip_file: El nombre del archivo zip donde se va a guardar el modelo. Por defecto, es "models.zip".
+    """
+    # fecha y hora actual
+    now = datetime.now()
+
+    # Formatear la fecha y hora como yymmddhhmmss
+    formatted_date = now.strftime("%y%m%d%H%M%S")
+
+    # Generar el nombre del archivo con el formato "model_fecha.pkl"
+    file_name = f"model_{formatted_date}.pkl"
+
+    # Crear el directorio si no existe
+    if not os.path.exists("models"):
+        os.makedirs("models")
+
+    # Guardar el modelo en el archivo dentro del directorio
+    file_path = os.path.join("models", file_name)
+    with open(file_path, "wb") as file:
+        pickle.dump(model, file)
+
+    # Abrir el archivo zip existente en modo "a" y agregar el archivo del modelo
+    with zipfile.ZipFile(zip_file, "a") as zip:
+        print('el archivo se guardará en: ',zip.filename)
+        zip.write(file_path, file_name)
+        
+    # Eliminar el archivo del modelo individual
+    os.remove(file_path)
+
+
+
+
+def load_model(zip_file, model_file):
+    import pickle
+    import zipfile
+    """
+    Carga un archivo de modelo de un archivo zip.
+
+    Args:
+        zip_file: El nombre del archivo zip donde se encuentra el archivo del modelo.
+        model_file: El nombre del archivo de modelo que se va a cargar.
+
+    Returns:
+        El modelo cargado desde el archivo.
+    """
+    # Abrir el archivo zip en modo lectura
+    with zipfile.ZipFile(zip_file, "r") as zip:
+        # Leer el archivo de modelo del zip y cargarlo en memoria
+        with zip.open(model_file, "r") as file:
+            model = pickle.load(file)
+
+    return model
+
+def load_csv_from_zip(zip_file, csv_file, sep=';'):
+
+    import pickle
+    import zipfile
+    """
+    Carga un archivo CSV desde un archivo zip con una separación personalizada.
+
+    Args:
+        zip_file: El nombre del archivo zip que contiene el archivo CSV.
+        csv_file: El nombre del archivo CSV que se va a cargar.
+        sep: El separador a utilizar al leer el archivo CSV.
+
+    Returns:
+        Un objeto DataFrame de pandas que contiene los datos del archivo CSV.
+    """
+    with zipfile.ZipFile(zip_file, 'r') as zip:
+        with zip.open(csv_file, 'r') as file:
+            # Lee el archivo CSV con el separador personalizado
+            df = pd.read_csv(file, sep=sep)
+
+    return df
+
+
+
+def load_model_pattern(zip_file, model_pattern):
+    import pickle
+    import zipfile
+
+    # Abrir el archivo zip en modo lectura
+    with zipfile.ZipFile(zip_file, "r") as zip:
+        # Buscar el archivo de modelo que coincida con el patrón de nombres
+        model_files = [f for f in zip.namelist() if re.match(model_pattern, f)]
+        if not model_files:
+            raise ValueError(f"No se encontró ningún archivo de modelo que coincida con el patrón {model_pattern}")
+        elif len(model_files) > 1:
+            raise ValueError(f"Se encontraron varios archivos de modelo que coinciden con el patrón {model_pattern}")
+        model_file = model_files[0]
+
+        # Leer el archivo de modelo del zip y cargarlo en memoria
+        with zip.open(model_file, "r") as file:
+            model = pickle.load(file)
+
+    return model
