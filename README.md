@@ -57,13 +57,13 @@ Cabe destacar que la estructura puede verse afectada dado que he tenido que adap
 ├── Export_models/                                         
 │         └── primer_modelo.zip                            
 ├── model/                                                 
-│    └── Primera entrega/                                  
-│          ├── dtr_model.pkl                               
-│          ├── knn_model.pkl                               
-│          ├── dtr_230214.pkl                              
-│          ├── lin_reg_230214.pkl                          
-│          ├── poly_reg_230214.pkl                         
-│          └── rfr_230214.pkl                              
+│    ├─── Primera entrega/                                  
+│    │      ├── dtr_model.pkl                               
+│    │      └── knn_model.pkl                               
+│    ├── dtr_230214.pkl                              
+│    ├── lin_reg_230214.pkl                          
+│    ├── poly_reg_230214.pkl                         
+│    └── rfr_230214.pkl                              
 ├── notebooks/                                             
 │           └── primera_entrega.ipynb                      
 ├── production/ 
