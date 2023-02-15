@@ -10,6 +10,9 @@ from imblearn.over_sampling import SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 import pickle
 import os
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+
 
 
 
@@ -287,14 +290,80 @@ def escaler_data(X_train, X_test):
     return X_train_scal, X_test_scal
 
 
-def save_model(model, file_path):
 
+def save_model(model):
+    import pickle
+    from datetime import datetime
+    """
+    Guarda el modelo en un archivo con el nombre "model_fecha.pkl", donde
+    fecha es la fecha actual en formato yymmddhhmmss.
 
-    with open(file_path, "wb") as archivo_salida:
-        pickle.dump(model, archivo_salida)
+    Args:
+        model: El modelo que se va a guardar.
+    """
+    # fecha y hora actual
+    now = datetime.now()
+
+    # Formatear la fecha y hora como yymmddhhmmss
+    formatted_date = now.strftime("%y%m%d%H%M%S")
+
+    # Generar el nombre del archivo con el formato "model_fecha.pkl"
+    file_name = f"model_{formatted_date}.pkl"
+
+    # Guardar el modelo en el archivo
+    with open(file_name, "wb") as file:
+        pickle.dump(model, file)
 
 
 def load_pipeline(filepath):
     with open(filepath, "rb") as archivo_entrada:
         pipeline_importada = pickle.load(archivo_entrada)
     return pipeline_importada
+
+
+# def wordcloud(data,bgcolor,title):
+
+#     plt.figure(figsize = (50,50))
+#     wc = WordCloud(background_color = bgcolor, max_words = 2000, random_state=42, max_font_size = 50)
+#     wc.generate(' '.join(data))
+#     plt.imshow(wc)
+#     plt.axis('off')
+
+def generate_wordcloud(data, bgcolor, title):
+
+    '''
+    librerías necesarias: matplotlib.pyplot para visualizar la imagen generada y WordCloud para crear el wordcloud.
+    La función recibe tres parámetros: data, que es la columna de datos; bgcolor, que es el color de fondo del wordcloud; y title, que es el título de la imagen.
+    '''
+
+    # Concatenate all the rows in the data into one string
+    text = ' '.join(data.astype(str).tolist())
+
+    # Generate the wordcloud
+    wordcloud = WordCloud(background_color=bgcolor).generate(text)
+
+    # Display the generated image
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.title(title)
+    plt.show()
+
+
+
+
+def read_csv_from_zip(zip_path, csv_filename):
+    import zipfile
+    """
+    Lee un archivo CSV de un archivo zip y devuelve un objeto de Pandas DataFrame.
+
+    Args:
+        zip_path (str): La ruta del archivo zip.
+        csv_filename (str): El nombre del archivo CSV dentro del archivo zip.
+
+    Returns:
+        pandas.DataFrame: Un objeto DataFrame que contiene los datos del archivo CSV.
+    """
+    with zipfile.ZipFile(zip_path) as archive:
+        with archive.open(csv_filename) as file:
+            df = pd.read_csv(file)
+    return df

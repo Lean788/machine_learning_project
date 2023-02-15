@@ -78,10 +78,6 @@ pd.options.display.max_colwidth = 50
 
 # ACCEDIENDO A DF_TEST
 
-test = pd.read_csv('./src/data/test.csv')
+test = read_csv_from_zip('./data.zip', 'test.csv')
 
-print(test.head())
-
-
-
-
+print(test.head(2))
