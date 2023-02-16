@@ -195,7 +195,7 @@ def sentiment_analysis_full(df, column_text):
     df[column_text + "_sentiment"] = df[column_text + '_clean'].apply(sentiment_analysis)
 
     # Contar palabras
-    count_words(df, df['clean_text'])
+    count_words(df, df[column_text + '_clean'])
 
     # Polaridad de sentimiento
     df[column_text + "_polarity"] = df[column_text + '_clean'].apply(value_polarity)
@@ -233,7 +233,7 @@ def web_homeIndex(df):
 
 # Función para eliminar las columnas seleccionadas:
 
-def del_null_values(df, columns_to_delete=['reviews.userCity', 'reviews.userProvince']):
+def del_null_features(df, columns_to_delete=['reviews.userCity', 'reviews.userProvince']):
     df.drop(columns=columns_to_delete, inplace=True)
     return df
 
@@ -271,8 +271,6 @@ def binning(df, target_col, bins= [0.5, 1.5, 2.5, 3.5, 4.5, 5.5], labels= [1, 2,
     bins (list): La lista de bins para discretizar los valores, que dejaremos por defecto los que necesitamos para este problema.
     labels (list): Las etiquetas para los bins, que dejaremos por defecto los que necesitamos para este problema.
 
-    Returns:
-    pandas DataFrame: El DataFrame original con una nueva columna que representa la columna objetivo binada.
     """
     df[target_col + "_binned"] = pd.cut(df[target_col], bins, labels=labels, right=False).astype('int')
     return df
