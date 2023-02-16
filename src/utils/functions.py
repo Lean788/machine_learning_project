@@ -168,6 +168,13 @@ def value_subjectivity(text):
     return subjectivity
 
 
+# Valores nulos: se pondrán sin texto, para que el valor de esto sea cero en los paramentros del análisis
+def fill_reviews_text_nulls(df):
+    df['reviews.text'].fillna('without text', inplace=True)
+    df['reviews.title'].fillna('without text', inplace=True)
+    
+    return df
+
 
 # Función para encerrar todo el proceso de transformación y creación en el análisis de sentimiento:
 
@@ -199,9 +206,14 @@ def sentiment_analysis_full(df, column_text):
     return df
 
 
+# Valores nulos: se pondrán sin texto, para que el valor de esto sea cero en los paramentros del análisis
+def fill_reviews_text_nulls(df):
+    df['reviews.text'].fillna('without text', inplace=True)
+    df['reviews.title'].fillna('without text', inplace=True)
+    
+    return df
 
 # Generamos la función para encapsular la extracción de la raiz de la web:
-
 
 def web_homeIndex(df):
     import re
